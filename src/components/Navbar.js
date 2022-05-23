@@ -4,10 +4,13 @@ import { SiBinance } from "react-icons/si";
 import meta from "./images/meta.png";
 import connect from "./images/connect.svg";
 import { BiSearchAlt2 } from "react-icons/bi";
+// import DappNavbar from "./DappNavbar";
 import { AiOutlineLogout } from "react-icons/ai";
 import { getAccount } from "./Balance";
 import "./Dapp.css";
+import { DisconnectWallet } from "./web3";
 import Web3 from "web3";
+
 const web3 = new Web3(window.ethereum);
 console.log(web3);
 
@@ -15,15 +18,15 @@ export default function Navbar() {
   const [csvFile, setCsvFille] = useState();
   const [account, setAccount] = useState();
   const [chainid, setChainId] = useState(0);
-  const [datavalue, setDatavalue] = useState("");
+  const [datavalue, setDatavalue] = useState();
   const [getbalance, setGetBalance] = useState("");
   const [isconnected, setIsConnected] = useState(false);
   const [showdropdown, setShowDropDown] = useState(false);
   const [shownative, setShowNative] = useState(false);
-  const [disableicon, setDisableicon] = useState(false);
+  const [showmessage, setShowMessage] = useState(false);
+  const [line, setLine] = useState(false);
   const [result, setResult] = useState(false);
-
-  // []
+  const [merge, setMerge] = useState(false);
   const [headers, setHeaders] = useState([]);
 
   const duplicateInfo = [
@@ -129,9 +132,6 @@ export default function Navbar() {
   const processCSV = (str) => {
     setHeaders(str.slice(str.indexOf("\n") + 1).split("\n"));
 
-    // const rows = str.slice(str.indexOf("\n") + 1).split("\n");
-    //   // setHeaders(str.slice(0 str.indexOf("\n")).split(delim));
-    // console.log(rows);
     return headers;
   };
 
@@ -141,7 +141,7 @@ export default function Navbar() {
 
     reader.onload = function (e) {
       const text = e.target.result;
-      // console.log(text);
+      console.log(text);
       processCSV(text);
     };
 
@@ -164,6 +164,15 @@ export default function Navbar() {
       setIsConnected(!isconnected);
       console.log(window.ethereum);
     }
+  };
+
+  // Disconnect
+  const logOut = async () => {
+    await DisconnectWallet();
+    setIsConnected(!isconnected);
+    setAccount(undefined);
+    window.localStorage.removeItem("WC");
+    window.account = false;
   };
 
   // Change Network
@@ -194,14 +203,20 @@ export default function Navbar() {
     });
     setGetBalance(account);
     await connectMetamask();
+    await DisconnectWallet();
+    document.getElementById("alertAnim");
+    document.getElementById("alertAnim");
   }, []);
 
+  try {
+    window.ethereum.on("chainChanged", async () => {
+      console.log("chain changed.");
+      window.location.reload();
+    });
+  } catch (e) {
+    //
+  }
   // icon disappear and logout
-
-  const logOut = () => {
-    setAccount(undefined);
-    setIsConnected(!isconnected);
-  };
 
   // get balance
   console.log("address", getbalance);
@@ -213,16 +228,33 @@ export default function Navbar() {
 
   const Showdropdown = () => {
     setShowDropDown(!showdropdown);
-    setDisableicon(!disableicon);
+    // setDisableicon(!disableicon);
   };
 
   // show Natvie
+  const Shownative = () => {
+    setShowNative(!shownative);
+  };
 
-  const handleInput = () => {};
+  const handleChange = () => {
+    //
+  };
+
+  const ShowMessage = () => {
+    setShowMessage(!showmessage);
+    console.log("alert");
+  };
+
+  const ShowLine = () => {
+    setLine(!line);
+  };
+
+  const MergeItems = () => {};
+  setMerge(!merge);
 
   return (
     <div>
- 
+      {/* <DappNavbar /> */}
       <section>
         <div className="global-container">
           <div className="nav2-area" style={{ marginTop: "50px" }}>
@@ -250,110 +282,133 @@ export default function Navbar() {
             </div>
 
             {/* SWITCH NETWORK */}
-            <div id="wrapper">
-              <p>
-                <a className="button" href="#popup1">
-                  {chainid === 0 ? <FaEthereum /> : ""}
-                  {chainid === 1 ? <FaEthereum /> : ""}
-                  {chainid === 56 ? <SiBinance /> : ""}
-                  {chainid === 4 ? <FaEthereum color="black" /> : ""}
-                  {chainid === 3 ? <FaEthereum color="red" /> : ""}
-                  {chainid === 97 ? <SiBinance /> : ""}
-                </a>
-              </p>
-            </div>
 
-            <div id="popup1" className="overlay">
-              <div className="popup">
-                <h2>Change Network</h2>
-                <a className="close" href="/airdrop">
-                  &times;
-                </a>
-                <div className="content d-grid">
-                  <p
-                    style={{
-                      border: "1px solid",
-                      padding: "7px",
-                      textAlign: "center",
-                      cursor: "default",
-                      background: "black",
-                      color: "white",
-                    }}
-                    onClick={() => changeNetwork(56)}
-                  >
-                    <SiBinance />
-                    Binance Smart Chain
-                  </p>
-                  <p
-                    style={{
-                      border: "1px solid",
-                      padding: "7px",
-                      textAlign: "center",
-                      cursor: "default",
-                      background: "black",
-                      color: "white",
-                    }}
-                    onClick={() => changeNetwork(97)}
-                  >
-                    <SiBinance />
-                    Binance Smart Chain TESTNET
-                  </p>
-                  <p
-                    style={{
-                      border: "1px solid",
-                      padding: "7px",
-                      textAlign: "center",
-                      marginLeft: "10px",
-                      cursor: "default",
-                      background: "black",
-                      color: "white",
-                    }}
-                    onClick={() => changeNetwork(1)}
-                  >
-                    <FaEthereum />
-                    ETHEREUM MAINNET
-                  </p>
-                  <p
-                    style={{
-                      border: "1px solid",
-                      padding: "7px",
-                      textAlign: "center",
-                      marginLeft: "10px",
-                      cursor: "default",
-                      background: "black",
-                      color: "white",
-                    }}
-                    onClick={() => changeNetwork(4)}
-                  >
-                    <FaEthereum />
-                    RIKNEBY TESTNET
-                  </p>
-                  <p
-                    style={{
-                      border: "1px solid",
-                      padding: "7px",
-                      textAlign: "center",
-                      marginLeft: "10px",
-                      cursor: "default",
-                      background: "black",
-                      color: "white",
-                    }}
-                    onClick={() => changeNetwork(3)}
-                  >
-                    <FaEthereum />
-                    ROPSTEN TESTNET
-                  </p>
+            <button
+              type="button"
+              className="btn btn-outline-primary"
+              data-bs-toggle="modal"
+              data-bs-target="#exampleModal"
+              style={{ marginLeft: "auto" }}
+            >
+              {chainid === undefined ? <FaEthereum /> : ""}
+              {chainid === 1 ? <FaEthereum /> : ""}
+              {chainid === 56 ? <SiBinance /> : ""}
+              {chainid === 4 ? <FaEthereum color="black" /> : ""}
+              {chainid === 3 ? <FaEthereum color="red" /> : ""}
+              {chainid === 97 ? <SiBinance /> : ""}
+            </button>
+
+            <div
+              className="modal fade"
+              id="exampleModal"
+              tabIndex="-1"
+              aria-labelledby="exampleModalLabel"
+              aria-hidden="true"
+            >
+              <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div className="modal-content">
+                  <div className="modal-header">
+                    <h5 className="modal-title" id="exampleModalLabel">
+                      Modal title
+                    </h5>
+                    <button
+                      type="button"
+                      className="btn-close"
+                      data-bs-dismiss="modal"
+                      aria-label="Close"
+                      // onClick={() => Reloadpage()}
+                    ></button>
+                  </div>
+                  <div className="modal-body">
+                    {" "}
+                    <div className="content d-grid">
+                      <p
+                        style={{
+                          border: "1px solid",
+                          padding: "7px",
+                          textAlign: "center",
+                          cursor: "default",
+                          background: "black",
+                          color: "white",
+                        }}
+                        onClick={() => changeNetwork(56)}
+                      >
+                        <SiBinance />
+                        Binance Smart Chain
+                      </p>
+                      <p
+                        style={{
+                          border: "1px solid",
+                          padding: "7px",
+                          textAlign: "center",
+                          cursor: "default",
+                          background: "black",
+                          color: "white",
+                        }}
+                        onClick={() => changeNetwork(97)}
+                      >
+                        <SiBinance />
+                        Binance Smart Chain TESTNET
+                      </p>
+                      <p
+                        style={{
+                          border: "1px solid",
+                          padding: "7px",
+                          textAlign: "center",
+                          marginLeft: "10px",
+                          cursor: "default",
+                          background: "black",
+                          color: "white",
+                        }}
+                        onClick={() => changeNetwork(1)}
+                      >
+                        <FaEthereum />
+                        ETHEREUM MAINNET
+                      </p>
+                      <p
+                        style={{
+                          border: "1px solid",
+                          padding: "7px",
+                          textAlign: "center",
+                          marginLeft: "10px",
+                          cursor: "default",
+                          background: "black",
+                          color: "white",
+                        }}
+                        onClick={() => changeNetwork(4)}
+                      >
+                        <FaEthereum />
+                        RIKNEBY TESTNET
+                      </p>
+                      <p
+                        style={{
+                          border: "1px solid",
+                          padding: "7px",
+                          textAlign: "center",
+                          marginLeft: "10px",
+                          cursor: "default",
+                          background: "black",
+                          color: "white",
+                        }}
+                        onClick={() => changeNetwork(3)}
+                      >
+                        <FaEthereum />
+                        ROPSTEN TESTNET
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
 
             {/* CONNECT WALLET MODAL */}
+
             <div className="connect-wallet-area">
               <button
                 type="button"
                 className="btn btn-outline-primary"
                 data-bs-toggle="modal"
-                data-bs-target="#exampleModal"
+                data-bs-target="#connectModal"
                 style={{ marginLeft: "10px", cursor: "default" }}
               >
                 {account
@@ -383,7 +438,7 @@ export default function Navbar() {
 
           <div
             className="modal fade"
-            id="exampleModal"
+            id="connectModal"
             tabIndex="-1"
             aria-labelledby="exampleModalLabel"
             aria-hidden="true"
@@ -483,7 +538,7 @@ export default function Navbar() {
                 <h2>
                   <strong>Welcome to</strong>{" "}
                   <span style={{ color: "#22abe3" }}>
-                    <b>Company Airdrop</b>
+                    <b>KWS Airdrop</b>
                   </span>
                 </h2>
                 <p className="fs-5 py-3">
@@ -525,10 +580,11 @@ export default function Navbar() {
                   <input
                     type="text"
                     value={datavalue}
-                    onChange={handleInput}
+                    onChange={handleChange}
                     placeholder="Select your Token"
                     onClick={() => {
                       Showdropdown();
+                      Shownative();
                     }}
                   />
                 </div>
@@ -659,7 +715,7 @@ export default function Navbar() {
 
                 {/* WHEN WALELT IS NOT CONNECTED */}
 
-                {chainid === 1 && !account && shownative ? (
+                {!account && shownative ? (
                   <div className="dropdown">
                     <div className="dropdown-area-box">
                       <p
@@ -671,31 +727,8 @@ export default function Navbar() {
                           cursor: "default",
                         }}
                         onClick={() => {
-                          setShowDropDown(false);
                           setShowNative(false);
-                        }}
-                      >
-                        Native Currency
-                      </p>
-                    </div>
-                  </div>
-                ) : (
-                  ""
-                )}
-                {!chainid === 56 && !account && shownative ? (
-                  <div className="dropdown">
-                    <div className="dropdown-area-box">
-                      <p
-                        style={{
-                          color: "#000000",
-                          marginBottom: "12px",
-                          padding: "10px 23px 0px",
-                          textAlign: "start",
-                          cursor: "default",
-                        }}
-                        onClick={() => {
-                          setShowDropDown(false);
-                          setShowNative(false);
+                          setDatavalue(`Ethereum Mainnet Native Currency`);
                         }}
                       >
                         Native Currency
@@ -717,7 +750,6 @@ export default function Navbar() {
               </label>
 
               <input
-                disabled={disableicon ? true : false}
                 className="form-check-input"
                 type="checkbox"
                 role="switch"
@@ -792,7 +824,6 @@ export default function Navbar() {
                 className="form-control"
                 value={headers}
                 onChange={(e) => setHeaders(e.target.value)}
-                required
               ></textarea>
 
               <div
@@ -838,47 +869,111 @@ export default function Navbar() {
                 >
                   Upload
                 </button>
+                {!account && showmessage ? (
+                  <div
+                    className="alert alert-danger"
+                    role="alert"
+                    style={{
+                      border: "1px solid",
+                      maxWidth: "630px",
+                      marginLeft: "-55px",
+                      marginTop: "10px",
+                    }}
+                  >
+                    <div style={{ textAlign: "center" }}>
+                      Please select token first{" "}
+                    </div>
+                  </div>
+                ) : (
+                  ""
+                )}
+
+                {account && !datavalue && showmessage ? (
+                  <div
+                    className="alert alert-danger"
+                    role="alert"
+                    style={{
+                      border: "1px solid",
+                      maxWidth: "630px",
+                      marginLeft: "-55px",
+                      marginTop: "10px",
+                    }}
+                  >
+                    <div style={{ textAlign: "center" }}>
+                      Please select token first{" "}
+                    </div>
+                  </div>
+                ) : (
+                  ""
+                )}
+
+                {datavalue && getbalance && line ? (
+                  <div
+                    className="alert alert-danger"
+                    role="alert"
+                    style={{
+                      border: "1px solid",
+                      maxWidth: "630px",
+                      marginLeft: "-55px",
+                      marginTop: "10px",
+                    }}
+                  >
+                    <div style={{ textAlign: "center" }}>
+                      Line 1-0: Please provide a corresponding amount for each
+                      address. Click 'Show Sample CSV' for more details. Please
+                      provide at least 2 addresses
+                    </div>
+                  </div>
+                ) : (
+                  ""
+                )}
+
                 <button
                   type="submit"
                   className=" button btn btn-primary"
                   id="liveAlertBtn"
+                  onClick={() => {
+                    ShowMessage();
+                    ShowLine();
+                  }}
                 >
                   Next
                 </button>
               </div>
             </form>{" "}
           </div>
+        </div>
 
-          <div className="next-container">
-            <div id="liveAlertPlaceholder"></div>
+        <div className="next-container">
+          <div id="liveAlertPlaceholder"></div>
 
-            {result ? (
+          {headers && result ? (
+            <div
+              className="textarea"
+              style={{ maxWidth: "768px", margin: "auto" }}
+            >
               <div
-                className="textarea"
-                style={{ maxWidth: "768px", margin: "auto" }}
+                className="alert alert-danger my-4 text-center py-4"
+                role="alert"
               >
-                <div
-                  className="alert alert-danger my-4 text-center py-4"
-                  role="alert"
-                >
-                  {duplicate}
-                </div>
-                <div className="buttons text-center">
-                  <button
-                    className="btn-primary p-2 fw-normal"
-                    style={{ marginRight: "10px" }}
-                  >
-                    Merge duplicates
-                  </button>
-                  <button className="btn-primary p-2 fw-normal">
-                    Proceed without merging
-                  </button>
-                </div>
+                {duplicate}
               </div>
-            ) : (
-              ""
-            )}
-          </div>
+              <div className="buttons text-center">
+                <button
+                  className="btn-primary p-2 fw-normal"
+                  style={{ marginRight: "10px" }}
+                  onClick={() => MergeItems()}
+                >
+                  Merge duplicates
+                </button>
+                <button className="btn-primary p-2 fw-normal">
+                  Proceed without merging
+                </button>
+              </div>
+            </div>
+          ) : (
+            ""
+          )}
         </div>
       </section>
     </div>

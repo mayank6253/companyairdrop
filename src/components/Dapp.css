@@ -187,8 +187,8 @@ li.list-style {
   opacity: 1;
 }
 .connect-wallet-area {
-  margin-top: -20px;
-  margin-left: -16px;
+  margin-top: 0px;
+  margin-left: 0px;
 }
 .popup .content {
   max-height: 400px;
