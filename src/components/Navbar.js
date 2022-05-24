@@ -249,8 +249,10 @@ export default function Navbar() {
     setLine(!line);
   };
 
-  const MergeItems = () => {};
-  setMerge(!merge);
+  const MergeItems = () => {
+    setMerge(!merge);
+    alert("you don not hold enough tokens")
+  };
 
   return (
     <div>
